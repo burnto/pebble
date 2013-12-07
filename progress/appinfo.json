@@ -12,6 +12,13 @@
     "dummy": 0
   },
   "resources": {
-    "media": []
+    "media": [
+      {
+        "characterRegex": "[:0-9]",
+        "type": "font",
+        "name": "FONT_SLKSCR_8",
+        "file": "fonts/slkscr.ttf"
+      }
+    ]
   }
 }

@@ -64,13 +64,38 @@ void display_layer_update_callback(Layer *me, GContext* ctx) {
   graphics_context_set_fill_color(ctx, fillColor);
   graphics_fill_rect(ctx, currMinuteR, 0, GCornerNone);
 
-  // Draw interval lines
+  // Hour interval lines
   graphics_context_set_stroke_color(ctx, GColorWhite);
-
-  // Hour
   for (int hr = 0; hr <= hours; hr++) {
     draw_horiz_line(ctx, frame, hr * hrHeight);
   }
+
+  graphics_context_set_text_color(ctx, GColorWhite);
+  GFont font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SLKSCR_8));
+
+  // Draw hour text in last hour bar
+  char hour_text[] = "00";
+  char *hour_disp_text = hour_text;
+  strftime(hour_text, sizeof(hour_text), "%I", t);
+  if (hour_text[0] == '0') {
+    hour_disp_text += sizeof(char);
+  }
+  int hrY = (hrRect.origin.y + hrRect.size.h - hrHeight + 2);
+  graphics_draw_text(ctx, hour_disp_text, font, GRect(1, hrY, frame.size.w, 8), GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
+
+  // Draw minute text in minute bar or to right of it, depending on space.
+  char minute_text[] = "00";
+  strftime(minute_text, sizeof(minute_text), "%M", t);
+  int minuteY = hrY + hrHeight;
+  int minuteX = hrRect.origin.x + 1;
+
+  GSize minRenderSize = graphics_text_layout_get_max_used_size(ctx, minute_text, font, GRect(0, 0, 1000, 1000), GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
+  if (minRenderSize.w > elMinutesR.size.w - 2) {
+    minuteX += currMinuteR.origin.x + currMinuteR.size.w;
+    graphics_context_set_text_color(ctx, GColorBlack);
+  }
+  graphics_draw_text(ctx, minute_text, font, GRect(minuteX, minuteY, frame.size.w, 8), GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
+
 
 }
 
