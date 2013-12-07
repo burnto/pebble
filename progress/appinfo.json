@@ -1,0 +1,17 @@
+{
+  "uuid": "1cbcf7da-06f7-49ca-8099-ff1ef676f687",
+  "shortName": "progress",
+  "longName": "progress",
+  "companyName": "Brent Fitzgerald",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
