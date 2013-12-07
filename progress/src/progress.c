@@ -7,10 +7,26 @@ Window *window;
 
 Layer *display_layer;
 
-void draw_horiz_line(GContext *ctx, GRect frame, int y) {
+inline void draw_vert_segment(GContext *ctx, GPoint origin, int length) {
+  GPoint end = origin;
+  end.y += length;
+  graphics_draw_line(ctx, origin, end);
+}
+
+inline void draw_vert_line(GContext *ctx, GRect frame, int x) {
+  GPoint p0 = {frame.origin.y, frame.origin.x + x};
+  draw_vert_segment(ctx, p0, frame.size.h);
+}
+
+inline void draw_horiz_segment(GContext *ctx, GPoint origin, int length) {
+  GPoint end = origin;
+  end.x += length;
+  graphics_draw_line(ctx, origin, end);
+}
+
+inline void draw_horiz_line(GContext *ctx, GRect frame, int y) {
   GPoint p0 = {frame.origin.x, frame.origin.y + y};
-  GPoint p1 = {frame.origin.x + frame.size.w, frame.origin.y + y};
-  graphics_draw_line(ctx, p0, p1);
+  draw_horiz_segment(ctx, p0, frame.size.w);
 }
 
 void display_layer_update_callback(Layer *me, GContext* ctx) {
@@ -18,12 +34,10 @@ void display_layer_update_callback(Layer *me, GContext* ctx) {
   GRect frame = layer_get_frame(me);
 
   time_t now = time(NULL);
-
   struct tm *t = localtime(&now);
 
-  graphics_context_set_stroke_color(ctx, GColorWhite);
-
   int hours = t->tm_hour % 12;
+  int minutes = t->tm_min;
 
   float hrHeight = frame.size.h / 12.0f;
   float minuteWidth = frame.size.w / 60.0f;
@@ -38,19 +52,22 @@ void display_layer_update_callback(Layer *me, GContext* ctx) {
   GRect elMinutesR;
   elMinutesR.origin = frame.origin;
   elMinutesR.origin.y = hrRect.size.h + hrRect.origin.y;
-  elMinutesR.size.w = floor(minuteWidth * t->tm_min);
+  elMinutesR.size.w = floor(minuteWidth * minutes) - 1; // Leave room for a gap
   elMinutesR.size.h = ceil(hrHeight);
   graphics_fill_rect(ctx, elMinutesR, 0, GCornerNone);
 
   // Draw blinking current minute
   GRect currMinuteR = elMinutesR;
-  currMinuteR.origin.x = elMinutesR.size.w + elMinutesR.origin.x + 1;
+  currMinuteR.origin.x = elMinutesR.size.w + elMinutesR.origin.x + 1; // Aforementioned gap
   currMinuteR.size.w = ceil(minuteWidth);
   GColor fillColor = (t->tm_sec % 2 == 0) ? GColorWhite : GColorBlack;
   graphics_context_set_fill_color(ctx, fillColor);
   graphics_fill_rect(ctx, currMinuteR, 0, GCornerNone);
 
-  // Draw hour intervals
+  // Draw interval lines
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+
+  // Hour
   for (int hr = 0; hr <= hours; hr++) {
     draw_horiz_line(ctx, frame, hr * hrHeight);
   }
