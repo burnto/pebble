@@ -1,0 +1,17 @@
+{
+  "uuid": "4806ef1f-1cd4-4cda-b9bd-2af02164ef21",
+  "shortName": "Meter",
+  "longName": "Meter",
+  "companyName": "Brent Fitzgerald",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
